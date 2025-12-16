@@ -113,3 +113,24 @@ fn system_and_balances_work() {
 		assert_ok!(PalletBalances::mint_into(&BOB, 100));
 	});
 }
+
+#[test]
+fn create_kitty_checks_signed() {
+	new_test_ext().execute_with(|| {
+		// The `create_kitty` extrinsic should work when being called by a user.
+		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+		// The `create_kitty` extrinsic should fail when being called by an unsigned message.
+		assert_noop!(PalletKitties::create_kitty(RuntimeOrigin::none()), DispatchError::BadOrigin);
+	})
+}
+
+#[test]
+fn create_kitty_emits_event() {
+	new_test_ext().execute_with(|| {
+		System::set_block_number(1);
+
+		assert_ok!(PalletKitties::create_kitty(RuntimeOrigin::signed(ALICE)));
+
+		System::assert_last_event(Event::<TestRuntime>::Created { owner: 1 }.into());
+	})
+}
