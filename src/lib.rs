@@ -8,7 +8,10 @@ pub use pallet::*;
 
 #[frame::pallet(dev_mode)]
 pub mod pallet {
-	use super::*;
+	use alloc::collections::BTreeMap;
+use frame::testing_prelude::storage::types::QueryKindTrait;
+
+use super::*;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(core::marker::PhantomData<T>);
@@ -21,6 +24,9 @@ pub mod pallet {
 	#[pallet::storage]
 	pub(super) type CountForKitties<T: Config> = StorageValue<Value = u32, QueryKind = ValueQuery>;
 
+
+	#[pallet::storage]
+	pub(super) type Kitties<T: Config> = StorageMap<Key = [u8; 32], Value = ()>;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
