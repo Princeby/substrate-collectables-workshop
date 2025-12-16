@@ -20,7 +20,7 @@ pub mod pallet {
 
 	#[pallet::storage]
 	pub(super) type CountForKitties<T: Config> = StorageValue<Value = u32>;
-	
+
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -29,7 +29,9 @@ pub mod pallet {
 	}
 
 	#[pallet::error]
-	pub enum Error<T> {}
+	pub enum Error<T> {
+		TooManyKitties,
+	}
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
