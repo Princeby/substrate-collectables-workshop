@@ -8,10 +8,7 @@ pub use pallet::*;
 
 #[frame::pallet(dev_mode)]
 pub mod pallet {
-	use alloc::collections::BTreeMap;
-use frame::testing_prelude::storage::types::QueryKindTrait;
-
-use super::*;
+	use super::*;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(core::marker::PhantomData<T>);
@@ -21,9 +18,12 @@ use super::*;
 		type RuntimeEvent: From<Event<Self>> + IsType<<Self as frame_system::Config>::RuntimeEvent>;
 	}
 
+
+	#[derive(Encode,Decode,TypeInfo, MaxEncodedLen)]
+	#[scale_info(skip_type_params(T))]
 	pub struct Kitty<T: Config> {
-		dna: [u8; 32],
-		owner: T::AccountId,
+		pub dna: [u8; 32],
+		pub owner: T::AccountId,
 	}
 
 	#[pallet::storage]
@@ -31,7 +31,7 @@ use super::*;
 
 
 	#[pallet::storage]
-	pub(super) type Kitties<T: Config> = StorageMap<Key = [u8; 32], Value = ()>;
+	pub(super) type Kitties<T: Config> = StorageMap<Key = [u8; 32], Value = Kitty<T>>;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub(super) fn deposit_event)]
@@ -49,7 +49,8 @@ use super::*;
 	impl<T: Config> Pallet<T> {
 		pub fn create_kitty(origin: OriginFor<T>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
-			Self::mint(who)?;
+			let dna = [0u8; 32];
+			Self::mint(who, dna)?;
 			Ok(())
 		}
 	}
