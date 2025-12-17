@@ -19,6 +19,7 @@ use frame::runtime::prelude::*;
 use frame::testing_prelude::*;
 use frame::traits::fungible::*;
 
+
 type Balance = u64;
 type Block = frame_system::mocking::MockBlock<TestRuntime>;
 
@@ -28,6 +29,7 @@ type Block = frame_system::mocking::MockBlock<TestRuntime>;
 // We create the constants `ALICE` and `BOB` to make it clear when we are representing users below.
 const ALICE: u64 = 1;
 const BOB: u64 = 2;
+const DEFAULT_KITTY: Kitty<TestRuntime> = Kitty { dna: [0u8; 32 ], owner: 0};
 
 #[runtime]
 mod runtime {
