@@ -83,6 +83,7 @@ impl pallet_balances::Config for TestRuntime {
 // will also need to update this configuration to represent that.
 impl pallet_kitties::Config for TestRuntime {
 	type RuntimeEvent = RuntimeEvent;
+	type NativeBalance = PalletBalances;
 }
 
 // We need to run most of our tests using this function: `new_test_ext().execute_with(|| { ... });`
@@ -149,6 +150,17 @@ fn transfer_emits_event() {
 		assert_ok!(PalletKitties::transfer(RuntimeOrigin::signed(ALICE), BOB, kitty_id));
 		System::assert_last_event(
 			Event::<TestRuntime>::Transferred { from: ALICE, to: BOB, kitty_id }.into(),
+		);
+	});
+}
+
+#[test] 
+fn native_balance_associated_type_works() {
+	new_test_ext().execute_with(|| {
+		assert_ok!(<<TestRuntime as Config>::NativeBalance as Mutate<_>>::mint_into(&ALICE, 1337));
+		assert_eq!(	
+			<<TestRuntime as Config>::NativeBalance as Inspect<_>>::total_balance(&ALICE),
+			1337
 		);
 	});
 }
