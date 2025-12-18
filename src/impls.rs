@@ -20,7 +20,7 @@ impl<T: Config> Pallet<T> {
 
 	pub fn mint(owner: T::AccountId, dna: [u8; 32]) -> DispatchResult {
 
-		let kitty = Kitty { dna: dna, owner: owner.clone() };
+		let kitty = Kitty { dna: dna, owner: owner.clone(), price: None };
 
 		ensure!(!Kitties::<T>::contains_key(dna), Error::<T>::DuplicateKitty);
 		let current_count: u32 = CountForKitties::<T>::get();
@@ -39,6 +39,7 @@ impl<T: Config> Pallet<T> {
 		let mut kitty = Kitties::<T>::get(kitty_id).ok_or(Error::<T>::NoKitty)?;
 		ensure!(kitty.owner == from, Error::<T>::NotOwner);
 		kitty.owner = to.clone();
+		kitty.price = None;
 
 		let mut to_owned = KittiesOwned::<T>::get(&to);	
 		to_owned.try_push(kitty_id).map_err(|_| Error::<T>::TooManyOwned)?;
