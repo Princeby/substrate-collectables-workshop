@@ -10,7 +10,7 @@ pub use pallet::*;
 
 #[frame::pallet(dev_mode)]
 pub mod pallet {
-	use super::*;
+use super::*;
 
 	#[pallet::pallet]
 	pub struct Pallet<T>(core::marker::PhantomData<T>);
@@ -54,6 +54,7 @@ pub mod pallet {
 		Created { owner: T::AccountId },
 		Transferred { from: T::AccountId, to: T::AccountId, kitty_id: [u8; 32]},
 		PriceSet { owner: T::AccountId, kitty_id: [u8; 32], new_price: Option<BalanceOf<T>> },
+		Sold { buyer: T::AccountId, kitty_id: [u8; 32], price: BalanceOf<T> },
 	}
 
 	#[pallet::error]
@@ -63,7 +64,9 @@ pub mod pallet {
 		TooManyOwned,
 		TransferToSelf,
 		NoKitty,
-		NotOwner
+		NotOwner,
+		NotForSale,
+		MaxPriceTooLow,
 	}
 
 	#[pallet::call]
@@ -84,6 +87,7 @@ pub mod pallet {
 			Self::do_transfer(who, to, kitty_id)?;
 			Ok(())
 		}
+
 		pub fn set_price(
 			origin: OriginFor<T>,
 			kitty_id: [u8; 32],
@@ -91,6 +95,16 @@ pub mod pallet {
 		) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 			Self::do_set_price(who, kitty_id, new_price)?;
+			Ok(())
+		}
+
+		pub fn buy_kitty(
+			origin: OriginFor<T>,
+			kitty_id: [u8; 32],
+			max_price: BalanceOf<T>,
+		) -> DispatchResult {
+			let who = ensure_signed(origin)?;
+			Self::do_buy_kitty(who, kitty_id, max_price)?;
 			Ok(())
 		}
 	}
